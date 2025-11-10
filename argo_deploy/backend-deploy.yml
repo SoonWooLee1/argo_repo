@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: boot-container
-        image: dltnsdn7367/argo_boot:1
+        image: dltnsdn7367/argo_boot:5
         imagePullPolicy: Always
         ports:
         - containerPort: 7777
