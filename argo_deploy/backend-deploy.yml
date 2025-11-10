@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argo-boot-dep
+  annotations:
+    argocd.argoproj.io/sync-wave: "3" 
+spec:
+  selector:
+    matchLabels:
+      app: bootdep
+  # replicas: 3
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: bootdep
+    spec:
+      containers:
+      - name: boot-container
+        image: dltnsdn7367/argo_boot:1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 7777
+        # MariaDB ?�결???�한 ?�경변???�정
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:mariadb://argo-mariadb-ser:3310/calcdb"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "root"
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "root1234"
+        # Health Check - Spring Boot가 ?�상 ?�행?�는지 ?�인
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 7777
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 7777
+          initialDelaySeconds: 60
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 3
